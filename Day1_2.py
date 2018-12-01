@@ -1,4 +1,4 @@
-print("Advent of Code; day 1 task 1")
+print("Advent of Code; day 1 task 2")
 sequenceFile = open("sequenceFile.txt", "r")
 #sequenceFile = open("testFile.txt", "r")
 #sequenceFile = open("testFile2.txt", "r")
