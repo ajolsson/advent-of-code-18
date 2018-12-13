@@ -1,7 +1,7 @@
 import re
 
 print("Advent of Code; day 7 task 1")
-dataFile = open("day7Data.txt", "r") #CQSWKZFJONPBEUMXADLYIGVRHT
+dataFile = open("day7Data_test1.txt", "r") #CQSWKZFJONPBEUMXADLYIGVRHT
 #dataFile = open("day7Data_test1.txt", "r") #CABDFE
 
 data = dataFile.readlines()
