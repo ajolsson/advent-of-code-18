@@ -5,10 +5,10 @@ debug_output = False
 
 if debug == True:
     print("DEBUG")
-    dataFile = open("Day8Data_test1.txt", "r") #138
+    dataFile = open("Day8Data_test1.txt", "r") #66
 else:
     print("LIVE")
-    dataFile = open("Day8Data.txt", "r") #46962
+    dataFile = open("Day8Data.txt", "r") #
 
 data = dataFile.read()
 dataFile.close()
@@ -39,11 +39,30 @@ def get_child_nodes():
 
     return (children, metadata)
 
-def get_metadata(children, metadata):
+def sum_metadata(children, metadata):
     result = sum(metadata)
     for c in children:
-        result += get_metadata(c[0], c[1])
+        result += sum_metadata(c[0], c[1])
     return result
 
+def get_result(v):
+    global value
+    value += v
+    return value
+
+def get_nodevalue(children, metadata, result):
+    if len(children) > 0:
+        for m in metadata:
+            if len(children) >= m:
+                child = children[m - 1]
+                get_nodevalue(child[0], child[1], result)
+            else:
+                result += 0
+    else:
+        get_result(sum(metadata))
+
+    return get_result(0)
+
 root = get_child_nodes()
-print(get_metadata(root[0], root[1]))
+value = 0
+print(get_nodevalue(root[0], root[1], 0))
