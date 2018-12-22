@@ -67,11 +67,23 @@ def next_generation(pot):
         if pattern == k:
             return keys[k]
     return False
+
+def get_results():
+    result = 0
+    for p in pots:
+        if p.has_plant == True:
+            result += p.number
+    return result
+
+def print_results(generation):
+    print(str(generation) + ": " + str(get_results()))
         
-print("Advent of Code; day 12 task 1")
+print("Advent of Code; day 12 task 2")
 
 debug = False
-debug_output = False
+number_of_generations = 300
+total_generations = 50000000000
+initial_pots = 300
 
 if debug == True:
     print("DEBUG")
@@ -80,7 +92,7 @@ if debug == True:
 else:
     print("LIVE")
     initial_state = "##..#..##....#..#..#..##.#.###.######..#..###.#.#..##.###.#.##..###..#.#..#.##.##..###.#.#...#.##.."
-    file_name = "Day12Data.txt" #3793
+    file_name = "Day12Data.txt" #4300000002414 (change: 86)
 
 data_file = open(file_name, "r")
 data = data_file.readlines()
@@ -115,19 +127,16 @@ last_pot = pot
 
 prev_left_pot = first_pot
 prev_right_pot = last_pot
-for pos in range(0, 20):
+for pos in range(0, initial_pots):
     prev_left_pot = prev_left_pot.add_left()
     prev_right_pot = prev_right_pot.add_right()
     pots.append(prev_left_pot)
     pots.append(prev_right_pot)
 
-if debug_output == True:
-    pattern = ""
-    for p in pots:
-        pattern += p.get_local_pattern()
-    print(pattern)
-
-for g in range(0, 20):
+previous_result = 0
+for g in range(0, number_of_generations):
+    previous_result = get_results()
+    
     for p in pots:
         will_have_plant = next_generation(p)
         p.next_gen_plant = will_have_plant
@@ -135,20 +144,10 @@ for g in range(0, 20):
     for p in pots:
         p.apply_next_gen()
 
+results = get_results()
+generation_change = results - previous_result
 
-if debug_output == True:
-    pattern = ""
-    for p in pots:
-        pattern += p.get_local_pattern()
-    print(pattern)
-
-if debug_output == True:
-    for p in pots:
-        print(p.number, p.get_local_pattern())
-
-result = 0
-for p in pots:
-    if p.has_plant == True:
-        result += p.number
-
-print("Result: " + str(result))
+generations_to_calculate = total_generations - number_of_generations
+forecast = generations_to_calculate * generation_change
+forecast += results
+print("Results: " + str(forecast))

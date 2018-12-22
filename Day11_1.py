@@ -54,5 +54,4 @@ while x < width - 2:
         y += 1
     x += 1
 
-#print(max_sum, max_coord)
 print("Result: " + str(max_coord[0]) + "," + str(max_coord[1]))
