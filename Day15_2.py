@@ -1,12 +1,13 @@
 import sys
 
 class Game:
-    def __init__(self, file_name, debug_output, stepwise_approval, unit_test):
-        self.board = Board(file_name, unit_test)
+    def __init__(self, file_name, elf_attack_power, debug_output, stepwise_approval, unit_test):
+        self.board = Board(file_name, elf_attack_power, unit_test)
         self.debug_output = debug_output
         self.active = True
         self.stepwise_approval = stepwise_approval
         self.unit_test = unit_test
+        self.elf_attack_power = elf_attack_power
 
     def run(self):
         if self.debug_output:
@@ -14,20 +15,23 @@ class Game:
             self.board.print(True)
 
         while self.active:
+
+            for unit in self.board.units:
+                if unit.type == "E" and unit.health < 1:
+                    return False
+
             units = self.board.get_live_units()
-            #any_unit_action = False
             all_units_action = True
             for unit in units:
                 if unit.is_alive():
                     if not self.board.next_turn(unit):
-                        #any_unit_action = True
                         all_units_action = False
-                # if unit.is_alive() and self.board.next_turn(unit):
-                #     any_unit_action = True
             
-            #if any_unit_action:
             if all_units_action:
                 self.board.turns += 1
+
+                if not self.unit_test:
+                    print(self.board.turns)
 
             if self.debug_output:
                 print("After turn: " + str(self.board.turns))
@@ -36,7 +40,6 @@ class Game:
             if self.stepwise_approval:
                 input("Press Enter to continue...")
 
-            #if not any_unit_action:
             if not all_units_action:
                 self.active = False
 
@@ -56,10 +59,10 @@ class Game:
                 return result
 
 class Unit:
-    def __init__(self, type, x, y):
+    def __init__(self, type, x, y, attack_power):
         self.type = type
         self.health = 200
-        self.attack_power = 3
+        self.attack_power = attack_power
         self.node = None
 
     def attack(self, target):
@@ -69,7 +72,7 @@ class Unit:
         return self.health > 0
 
 class Board:
-    def __init__(self, file_name, unit_test):
+    def __init__(self, file_name, elf_attack_power, unit_test):
         data_file = open(file_name, "r")
         self.data = data_file.readlines()
         data_file.close()
@@ -80,13 +83,17 @@ class Board:
         self.units = [] 
         self.turns = 0
         self.unit_test = unit_test
+        self.elf_attack_power = elf_attack_power
 
         for x in range(0, self.width):
             for y in range(0, self.height):
                 char = self.data[y][x]
                 unit = None
                 if char == "E" or char == "G":
-                    unit = Unit(char, x, y)
+                    attack_power = 3
+                    if char == "E":
+                        attack_power = elf_attack_power
+                    unit = Unit(char, x, y, attack_power)
                     char = "."
                 
                 self.matrix[x][y] = char
@@ -313,61 +320,44 @@ class Node:
             nodes.append(self.down)
         return nodes
 
-print("Advent of Code; day 15 task 1")
+print("Advent of Code; day 15 task 2")
 
-debug_output = False
-stepwise_approval = False
+debug_output = True
+stepwise_approval = True
 
 def run_unit_tests():
-    game = Game("Day15Data_test1.txt", False, False, True) #27730 (47*590)
+    game = Game("Day15Data_test1.txt", 15, False, False, True) #4988 (29*172)
     sum = game.run()
-    print(sum == 27730)
+    print(sum == 4988)
 
-    game = Game("Day15Data_test4.txt", False, False, True) #27730 (47*590)
+    game = Game("Day15Data_test5.txt", 4, False, False, True) #31284 (33*948)
     sum = game.run()
-    print(sum == 36334)
+    print(sum == 31284)
 
-    game = Game("Day15Data_test5.txt", False, False, True) #39514 (46*859)
+    game = Game("Day15Data_test6.txt", 15, False, False, True) #3478 (37*94)
     sum = game.run()
-    print(sum == 39514)
+    print(sum == 3478)
 
-    game = Game("Day15Data_test6.txt", False, False, True) #27755 (35*793)
+    game = Game("Day15Data_test7.txt", 12, False, False, True) #6474 (39*166)
     sum = game.run()
-    print(sum == 27755)
+    print(sum == 6474)
 
-    game = Game("Day15Data_test7.txt", False, False, True) #28944 (54*536)
+    game = Game("Day15Data_test8.txt", 34, False, False, True) #1140 (30*38)
     sum = game.run()
-    print(sum == 28944)
+    print(sum == 1140)
 
-    game = Game("Day15Data_test8.txt", False, False, True) #18740 (20*937)
-    sum = game.run()
-    print(sum == 18740)
+def get_results(file_name, debug_output, stepwise_approval, unit_test):
+    elf_attack_power = 4
+    while True:
+        print("Trying with attack power: " + str(elf_attack_power) + "...")
+        game = Game(file_name, elf_attack_power, debug_output, stepwise_approval, unit_test)
+        r = game.run()
+        if r != False:
+            return str(r) + " (attack power: " + str(elf_attack_power) + ")"
+        elf_attack_power += 1
 
 run_unit_tests()
-
-# game = Game("Day15Data_test1.txt", True, stepwise_approval, False) #27730 (47*590)
-# game.run()
-
-# game = Game("Day15Data_test2.txt", True)
-# game.run()
-
-# game = Game("Day15Data_test3.txt", True)
-# game.run()
-
-# game = Game("Day15Data_test4.txt", debug_output, stepwise_approval, False) #36334 (37*982)
-# game.run()
-
-# game = Game("Day15Data_test5.txt", True, stepwise_approval) #39514 (46*859)
-# game.run()
-
-# game = Game("Day15Data_test6.txt", True, stepwise_approval) #27755 (35*793)
-# game.run()
-
-# game = Game("Day15Data_test7.txt", True, stepwise_approval) #28944 (54*536)
-# game.run()
-
-# game = Game("Day15Data_test8.txt", True, stepwise_approval) #18740 (20*937)
-# game.run()
-
-game = Game("Day15Data.txt", debug_output, stepwise_approval, False) #213692 (82*2606)
-print(game.run())
+#print(get_results("Day15Data_test1.txt", False, False, False))
+#print(get_results("Day15Data_test5.txt", False, False, False))
+print(get_results("Day15Data.txt", False, False, False)) #52688 (23 attack power)
+# game = Game("Day15Data.txt", debug_output, stepwise_approval, False) #213692 (82*2606)
